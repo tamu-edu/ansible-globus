@@ -30,9 +30,16 @@ repos:
     rev: 1.7.5
     hooks:
       - id: bandit
-        args: [--recursive, --skip, "B101,B601,B404,B603,B607", --configfile, pyproject.toml]
+        args:
+          [
+            --recursive,
+            --skip,
+            "B101,B601,B404,B603,B607",
+            --configfile,
+            pyproject.toml,
+          ]
         exclude: ^tests/
-        additional_dependencies: ['pbr']
+        additional_dependencies: ["pbr"]
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v3.4.0
@@ -46,9 +53,9 @@ repos:
         name: ansible-lint (via tox)
         entry: tox -e ansible-lint --
         language: system
-        files: ^docs/examples/.*\.(yaml|yml)$
+        files: ^examples/.*\.(yaml|yml)$
         pass_filenames: false
-        stages: [commit]
+        stages: [pre-commit]
       - id: pytest-check
         name: pytest-check
         entry: pytest

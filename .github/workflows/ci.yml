@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 env:
@@ -46,12 +46,12 @@ jobs:
 
       - name: Run YAML linting
         run: |
-          yamllint docs/examples/ || true
+          yamllint examples/ || true
           yamllint .github/workflows/
 
       - name: Run Ansible linting
         run: |
-          ansible-lint docs/examples/ || true
+          ansible-lint examples/ || true
 
   unit-tests:
     name: Unit Tests (SDK ${{ matrix.sdk-version }})
@@ -180,7 +180,7 @@ jobs:
     needs: [lint, unit-tests]
     strategy:
       fail-fast: false
-      max-parallel: 1  # Sequential to avoid search index conflicts (3 trial limit)
+      max-parallel: 1 # Sequential to avoid search index conflicts (3 trial limit)
       matrix:
         include:
           # SDK4: test both auth methods (primary target)

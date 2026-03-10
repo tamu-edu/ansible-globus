@@ -93,10 +93,32 @@ options:
             - "Example file: '/path/to/identity-mapping.json'"
         required: false
         type: raw
+    restrict_paths:
+        description:
+            - List of paths to restrict access to (storage_gateway only)
+            - Can be a file path (string), a dict with full mapping structure, or a list of paths
+            - "Example inline: [{read_write: '['$HOME','/scratch/user/$USER','/scratch/project']', none: ['/']}"
+            - "Example file: '/path/to/restrict-paths.json'"
+        required: false
+        type: raw
     root_path:
         description: Root path for POSIX storage (storage_gateway only)
         required: false
         type: str
+    authentication_timeout_mins:
+        description: Authentication timeout in minutes (storage_gateway only) - required if high_assurance is true
+        required: false
+        type: int
+    high_assurance:
+        description: Whether high assurance is required (storage_gateway only)
+        required: false
+        type: bool
+        default: false
+    require_mfa:
+        description: Whether to require multi-factor authentication (storage_gateway only)
+        required: false
+        type: bool
+        default: false
     # Collection options
     storage_gateway_id:
         description: ID of the storage gateway (collection only)
@@ -520,6 +542,37 @@ def create_storage_gateway(module, params):
 
         # Add identity mapping JSON content to command
         cmd.extend(["--identity-mapping", mapping_json])
+
+    # If restrict_path mapping is provided, add it to the create command
+    # This is required when more than one domain is specified
+    restrict_path = params.get("restrict_path")
+
+    if restrict_path:
+        # Check if it's a file path or inline definition
+        if isinstance(restrict_path, str):
+            # File path - read the file
+            if not os.path.exists(restrict_path):
+                module.fail_json(msg=f"Restrict path file not found: {restrict_path}")
+            with open(restrict_path) as f:
+                mapping_path_json = f.read()
+        else:
+            # Inline definition - convert to JSON string
+            if isinstance(restrict_path, list):
+                mapping_path_data = {
+                    "DATA_TYPE": "path_restrictions#1.0.0",
+                    "mappings": restrict_path,
+                }
+            elif isinstance(restrict_path, dict):
+                if "DATA_TYPE" not in restrict_path:
+                    restrict_path["DATA_TYPE"] = "path_restrictions#1.0.0"
+                mapping_path_data = restrict_path
+            else:
+                module.fail_json(msg="restrict_path must be a dict, list, or file path")
+
+            mapping_path_json = json.dumps(mapping_path_data)
+
+        # Add restrict path JSON content to command
+        cmd.extend(["--restrict-path", mapping_path_json])
 
     # High Assurance parameters
     if params.get("high_assurance"):
@@ -1028,6 +1081,9 @@ def main():
                 "default": ["globus.org", "globusid.org", "clients.auth.globus.org"],
             },
             "identity_mapping": {
+                "type": "raw",  # Can be dict or list
+            },
+            "restrict_paths": {
                 "type": "raw",  # Can be dict or list
             },
             "root_path": {"type": "str"},

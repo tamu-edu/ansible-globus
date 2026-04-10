@@ -85,6 +85,10 @@ options:
         type: list
         elements: str
         default: ['globus.org', 'globusid.org', 'clients.auth.globus.org']
+    user_message:
+        description: User message for gateway (storage_gateway only)
+        required: false
+        type: str
     identity_mapping:
         description:
             - Identity mapping configuration for the storage gateway
@@ -1087,6 +1091,7 @@ def main():
                 "type": "raw",  # Can be dict or list
             },
             "root_path": {"type": "str"},
+            "user_message": {"type": "str"},
             # High Assurance (storage gateway)
             "high_assurance": {"type": "bool", "default": False},
             "authentication_timeout_mins": {"type": "int"},

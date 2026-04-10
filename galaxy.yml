@@ -1,7 +1,7 @@
 ---
 namespace: m1yag1
 name: globus
-version: 0.5.2
+version: 0.6.0
 readme: README.md
 authors:
   - Ansible Globus Collection Contributors
@@ -28,7 +28,7 @@ tags:
 dependencies: {}
 
 repository: https://github.com/m1yag1/ansible-globus
-documentation: https://github.com/m1yag1/ansible-globus/blob/main/README.md
+documentation: https://ansible-globus.readthedocs.io
 homepage: https://github.com/m1yag1/ansible-globus
 issues: https://github.com/m1yag1/ansible-globus/issues
 

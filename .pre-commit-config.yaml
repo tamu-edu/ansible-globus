@@ -55,7 +55,7 @@ repos:
         language: system
         files: ^examples/.*\.(yaml|yml)$
         pass_filenames: false
-        stages: [pre-commit]
+        stages: [commit]
       - id: pytest-check
         name: pytest-check
         entry: pytest
